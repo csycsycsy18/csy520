@@ -180,6 +180,14 @@ def clear_all_finance():
     db.session.commit()
     return redirect(url_for('admin_finance'))#刚刚添加
 
+# 将这段代码添加到 app.py 的“管理员端路由”部分
+@app.route('/admin/finance/clear_all')
+def clear_all_finance():
+    Transaction.query.delete()
+    db.session.commit()
+    flash("所有对账记录已清空", "info")
+    return redirect(url_for('admin_finance'))
+
 @app.route('/admin/finance/delete_all')
 def delete_all_finance():
     Transaction.query.delete()
@@ -188,4 +196,5 @@ def delete_all_finance():
 
 if __name__ == '__main__':
     # 生产环境不要开启 debug=True
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))# 设置你的名字（可以是英文名或拼音）
+
