@@ -101,13 +101,28 @@ def user_action():
     price = float(request.form.get('price', 0))
 
     if action == "签到":
+        # 【新增逻辑】：检查是否已经在馆内（有入场没出场）
+        already_in = Attendance.query.filter_by(member_id=user.id, out_time=None).first()
+        if already_in:
+            flash(f"您当前已在馆内，请勿重复签到！(入场时间: {already_in.in_time.strftime('%H:%M')})", "warning")
+            return redirect(url_for('user_main'))
+        
         db.session.add(Attendance(member_id=user.id, member_name=user.name))
-        flash("签到成功！", "success")
+        flash("签到成功，祝您健身愉快！", "success")
+
     elif action == "签出":
+        # 【新增逻辑】：检查是否真的在馆内（找到那个没出场的记录）
         log = Attendance.query.filter_by(member_id=user.id, out_time=None).first()
-        if log: log.out_time = datetime.now()
-        flash("签出成功！", "info")
+        if log:
+            log.out_time = datetime.now()
+            flash("签出成功，期待下次再见！", "info")
+        else:
+            # 如果没找到没签出的记录，说明他根本没签到
+            flash("您当前不在馆内或已签出，请先签到！", "danger")
+            return redirect(url_for('user_main'))
+            
     else:
+        # 办理其他业务（私教、补剂等）
         db.session.add(Transaction(amount=price, item_name=action, member_name=user.name, category="增值业务"))
         flash(f"{action} 办理成功！", "success")
     
