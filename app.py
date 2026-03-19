@@ -174,12 +174,6 @@ def delete_finance(id):
     if t: db.session.delete(t); db.session.commit()
     return redirect(url_for('admin_finance'))
 
-@app.route('/admin/finance/clear_all')
-def clear_all_finance():
-    db.session.query(Transaction).delete()
-    db.session.commit()
-    return redirect(url_for('admin_finance'))#刚刚添加
-
 # 将这段代码添加到 app.py 的“管理员端路由”部分
 @app.route('/admin/finance/clear_all')
 def clear_all_finance():
