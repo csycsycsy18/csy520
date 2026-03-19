@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎来到力量健身</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); min-height: 100vh; display: flex; align-items: center; }
+        .start-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .brand-section { background: #fd7e14; color: white; padding: 50px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="start-card">
+                    <div class="row g-0">
+                        <div class="col-md-5 brand-section">
+                            <i class="fas fa-dumbbell fa-4x mb-3"></i>
+                            <h2 class="fw-bold">POWER GYM</h2>
+                            <p class="mt-4 text-white-50">开启你的蜕变之旅</p>
+                            <div class="mt-5 pt-5 border-top border-light border-opacity-25">
+                                <a href="/admin/dashboard" class="text-white-50 small text-decoration-none">
+                                    <i class="fas fa-lock me-1"></i> 管理员入口
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-7 p-5">
+                            <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab">
+                                <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#login">会员登录</button></li>
+                                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#reg">新入会注册</button></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="login">
+                                    <form action="/user/login" method="POST">
+                                        <div class="mb-3"><input type="text" name="phone" class="form-control" placeholder="手机号" required></div>
+                                        <div class="mb-3"><input type="password" name="password" class="form-control" placeholder="密码" required></div>
+                                        <button class="btn btn-dark w-100 py-2">登录</button>
+                                    </form>
+                                </div>
+                                <div class="tab-pane fade" id="reg">
+                                    <form action="/user/register" method="POST">
+                                        <div class="mb-3"><input type="text" name="name" class="form-control" placeholder="姓名" required></div>
+                                        <div class="mb-3"><input type="text" name="phone" class="form-control" placeholder="手机号" required></div>
+                                        <div class="mb-3"><input type="password" name="password" class="form-control" placeholder="设置密码" required></div>
+                                        <button class="btn btn-warning w-100 py-2 fw-bold">立即注册</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>会员档案 - 力量健身后台</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root { --accent: #ff8c00; --bg: #0b0b0b; --sidebar-bg: #000; --glass: rgba(255,255,255,0.05); }
+        body { background: var(--bg); color: #fff; font-family: 'PingFang SC', sans-serif; }
+        
+        /* 侧边栏保持一致 */
+        .sidebar { width: 260px; background: var(--sidebar-bg); position: fixed; height: 100vh; padding: 30px 20px; border-right: 1px solid #222; }
+        .main-content { margin-left: 260px; padding: 40px; }
+        .nav-link { color: #888; padding: 12px; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: var(--glass); color: var(--accent); }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: bold; }
+        
+        /* 玻璃卡片 */
+        .glass-card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); padding: 25px; }
+        .stat-val { font-size: 2rem; font-weight: 800; color: var(--accent); }
+        
+        /* 表格美化 */
+        .table { color: #ccc; border-color: #333; }
+        .table-hover tbody tr:hover { background: rgba(255,140,0,0.05) !important; color: #fff; }
+        .form-control, .form-select { background: #1a1a1a !important; border: 1px solid #333 !important; color: #fff !important; }
+        .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(255,140,0,0.25); border-color: var(--accent) !important; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h4 class="mb-5 fw-bold text-orange"><i class="fas fa-dumbbell me-2"></i>力量后台</h4>
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/admin/dashboard"><i class="fas fa-chart-pie me-2"></i>数据仪表盘</a>
+            <a class="nav-link active" href="/admin/members"><i class="fas fa-users me-2"></i>会员档案管理</a>
+            <a class="nav-link" href="/admin/finance"><i class="fas fa-wallet me-2"></i>账务对账单</a>
+            <hr class="my-4 border-secondary">
+            <a class="nav-link text-info" href="/user/main"><i class="fas fa-exchange-alt me-2"></i>切换至用户端</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">会员档案管理</h2>
+            <a href="/admin/member/delete_all" class="btn btn-outline-danger btn-sm" onclick="return confirm('警告：确定要注销所有会员吗？')">清空所有会员</a>
+        </div>
+
+        <div class="row g-4 mb-4 text-center">
+            <div class="col-md-6">
+                <div class="glass-card">
+                    <p class="text-muted mb-1">普通会员</p>
+                    <div class="stat-val">{{ n_count }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="glass-card">
+                    <p class="text-muted mb-1">高级会员 (Premium)</p>
+                    <div class="stat-val text-warning">{{ s_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card mb-4">
+            <h5 class="mb-3 text-orange"><i class="fas fa-user-plus me-2"></i>手动登记会员</h5>
+            <form action="/admin/add_member" method="POST" class="row g-3">
+                <div class="col-md-3">
+                    <input name="name" class="form-control" placeholder="姓名" required>
+                </div>
+                <div class="col-md-3">
+                    <input name="phone" class="form-control" placeholder="手机号" required>
+                </div>
+                <div class="col-md-3">
+                    <select name="level" class="form-select">
+                        <option value="普通会员">普通会员</option>
+                        <option value="高级会员">高级会员</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-warning w-100 fw-bold py-2">确认入库</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="glass-card p-0 overflow-hidden">
+            <table class="table table-dark table-hover mb-0">
+                <thead class="bg-dark text-muted">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>姓名</th>
+                        <th>联系电话</th>
+                        <th>身份等级</th>
+                        <th>有效期</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in members %}
+                    <tr>
+                        <td class="ps-4 text-muted">{{ m.id }}</td>
+                        <td class="fw-bold">{{ m.name }}</td>
+                        <td>{{ m.phone }}</td>
+                        <td>
+                            <span class="badge {% if m.level=='高级会员' %}bg-warning text-dark{% else %}bg-secondary{% endif %} px-3">
+                                {{ m.level }}
+                            </span>
+                        </td>
+                        <td><small class="text-muted">{{ m.expiry_date or '--' }}</small></td>
+                        <td class="text-center">
+                            <a href="/admin/member/delete/{{ m.id }}" class="text-danger" onclick="return confirm('确定要移除该会员档案？')">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

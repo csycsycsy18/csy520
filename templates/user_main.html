@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"><title>POWER GYM - 力量健身</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body { background: #000; color: #fff; }
+        .hero { padding: 60px 0; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1350'); background-size: cover; border-radius: 0 0 40px 40px; }
+        .glass { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; }
+        .card-btn { transition: 0.3s; cursor: pointer; border: 2px solid transparent; }
+        .card-btn:hover { border-color: #ff8c00; background: rgba(255,140,0,0.1); transform: translateY(-5px); }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between mb-4">
+            <h2 class="text-orange fw-bold">POWER GYM</h2>
+            <div>
+                <a href="/admin/dashboard" class="btn btn-outline-warning me-2">管理后台</a>
+                {% if user %}<a href="/user/logout" class="btn btn-danger">注销</a>{% endif %}
+            </div>
+        </div>
+
+        {% if not user %}
+        <div class="row justify-content-center pt-5">
+            <div class="col-md-5 glass p-5">
+                <h3 class="mb-4">开启您的健力之旅</h3>
+                <form action="/user/login" method="POST" class="mb-4">
+                    <input name="phone" class="form-control bg-dark text-white border-0 mb-3" placeholder="手机号直接登录" required>
+                    <button class="btn btn-warning w-100 fw-bold">会员登录</button>
+                </form>
+                <hr>
+                <form action="/user/register" method="POST">
+                    <input name="name" class="form-control bg-dark text-white border-0 mb-3" placeholder="您的姓名" required>
+                    <input name="phone" class="form-control bg-dark text-white border-0 mb-3" placeholder="联系电话" required>
+                    <button class="btn btn-outline-light w-100">加入会员</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="hero text-center mb-5">
+            <h1 class="display-3 fw-bold">欢迎回来，{{ user.name }}</h1>
+            <p class="fs-4">身份状态：<span class="text-orange">{{ user.level }}</span></p>
+            {% if user.level == '普通会员' %}
+                <form action="/user/upgrade" method="POST"><button class="btn btn-warning btn-lg px-5 mt-3">立即升级高级会员 (￥1688/年)</button></form>
+            {% else %}
+                <p class="text-muted small">有效期至：{{ user.expiry_date }}</p>
+            {% endif %}
+        </div>
+
+        <div class="row g-4 mb-5">
+            {% set items = [('签到','fa-map-pin','primary',0), ('签出','fa-sign-out-alt','success',0), ('办理私教','fa-user-tie','info',300), ('购买补剂','fa-pills','warning',150)] %}
+            {% for name, icon, color, price in items %}
+            <div class="col-md-3">
+                <div class="glass text-center card-btn" onclick="act('{{name}}', '{{price}}')">
+                    {% if user.level != '高级会员' %}<i class="fas fa-lock text-danger float-end"></i>{% endif %}
+                    <i class="fas {{icon}} fa-3x text-{{color}} mb-3"></i>
+                    <h5>{{name}}</h5>
+                    {% if price > 0 %}<p class="text-muted">￥{{price}}</p>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <form id="actForm" action="/user/action" method="POST" style="display:none">
+        <input name="action" id="a_name"><input name="price" id="a_price">
+    </form>
+    <script>
+        function act(name, price) {
+            if ("{{user.level}}" !== "高级会员") {
+                alert('该功能仅限“高级会员”使用，请先办理会员升级！');
+            } else if(confirm('确认进行 ' + name + ' ？')) {
+                document.getElementById('a_name').value = name;
+                document.getElementById('a_price').value = price;
+                document.getElementById('actForm').submit();
+            }
+        }
+    </script>
+</body>
+</html>

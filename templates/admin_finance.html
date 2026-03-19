@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>账务对账 - 力量健身后台</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root { --accent: #ff8c00; --bg: #0b0b0b; --sidebar-bg: #000; --glass: rgba(255,255,255,0.05); }
+        body { background: var(--bg); color: #fff; font-family: 'PingFang SC', sans-serif; }
+        
+        .sidebar { width: 260px; background: var(--sidebar-bg); position: fixed; height: 100vh; padding: 30px 20px; border-right: 1px solid #222; }
+        .main-content { margin-left: 260px; padding: 40px; }
+        .nav-link { color: #888; padding: 12px; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: var(--glass); color: var(--accent); }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: bold; }
+        
+        .glass-card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); padding: 25px; }
+        .income-total { font-size: 2.5rem; font-weight: 900; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.3); }
+        
+        .table { color: #ccc; }
+        .text-money { color: var(--accent); font-weight: bold; }
+        .category-tag { font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h4 class="mb-5 fw-bold text-orange"><i class="fas fa-dumbbell me-2"></i>力量后台</h4>
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/admin/dashboard"><i class="fas fa-chart-pie me-2"></i>数据仪表盘</a>
+            <a class="nav-link" href="/admin/members"><i class="fas fa-users me-2"></i>会员档案管理</a>
+            <a class="nav-link active" href="/admin/finance"><i class="fas fa-wallet me-2"></i>账务对账单</a>
+            <hr class="my-4 border-secondary">
+            <a class="nav-link text-info" href="/user/main"><i class="fas fa-exchange-alt me-2"></i>切换至用户端</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold">账务对账单</h2>
+                <p class="text-muted mb-0">系统全业务流水实时记录</p>
+            </div>
+            <div class="text-end">
+                <span class="text-muted small d-block mb-1">累计总营收 (CNY)</span>
+                <div class="income-total">￥{{ total_income }}</div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end mb-3">
+            <a href="/admin/finance/delete_all" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('注意：此操作将永久清空所有财务流水记录，不可恢复！')">
+                <i class="fas fa-eraser me-1"></i> 清空财务对账单
+            </a>
+        </div>
+
+        <div class="glass-card p-0 overflow-hidden">
+            <table class="table table-dark table-hover mb-0">
+                <thead class="bg-dark">
+                    <tr>
+                        <th class="ps-4">交易时间</th>
+                        <th>购买用户</th>
+                        <th>消费项目</th>
+                        <th>业务分类</th>
+                        <th>交易金额</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in trans %}
+                    <tr>
+                        <td class="ps-4 text-muted">{{ t.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="text-info fw-bold">{{ t.member_name }}</td>
+                        <td>{{ t.item_name }}</td>
+                        <td><span class="category-tag">{{ t.category }}</span></td>
+                        <td class="text-money">￥{{ t.amount }}</td>
+                        <td class="text-center">
+                            <a href="/admin/finance/delete/{{ t.id }}" class="text-muted" title="作废记录">
+                                <i class="fas fa-times-circle"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not trans %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">暂无交易流水记录</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

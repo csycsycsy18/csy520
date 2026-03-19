@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"><title>数据仪表盘 - 力量健身</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body { background: #0b0b0b; color: #fff; font-family: 'Segoe UI'; }
+        .sidebar { width: 260px; background: #000; position: fixed; height: 100vh; padding: 20px; border-right: 1px solid #333; }
+        .main-content { margin-left: 260px; padding: 40px; }
+        .nav-link { color: #888; margin-bottom: 10px; border-radius: 10px; }
+        .nav-link.active { background: #ff8c00; color: #000; font-weight: bold; }
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h4 class="text-orange mb-5"><i class="fas fa-dumbbell me-2"></i>管理控制台</h4>
+        <nav class="nav flex-column">
+            <a class="nav-link active" href="/admin/dashboard"><i class="fas fa-chart-pie me-2"></i>数据仪表盘</a>
+            <a class="nav-link text-white" href="/admin/members"><i class="fas fa-users me-2"></i>会员档案管理</a>
+            <a class="nav-link text-white" href="/admin/finance"><i class="fas fa-wallet me-2"></i>账务对账单</a>
+            <hr>
+            <a class="nav-link text-info fw-bold" href="/user/main">切换至用户端</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <h2 class="mb-4 fw-bold">数据概览</h2>
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="glass-card text-center">
+                    <p class="text-muted">历史签到总人次</p>
+                    <h1 class="display-2 fw-bold text-orange">{{ in_total }}</h1>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="glass-card text-center">
+                    <p class="text-muted">历史签出总人次</p>
+                    <h1 class="display-2 fw-bold text-success">{{ out_total }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card border-danger border-start border-5">
+            <h5>数据维护中心</h5>
+            <p class="text-muted">此操作将永久删除系统内所有的会员签到及签出记录。</p>
+            <a href="/admin/clear_attendance" class="btn btn-outline-danger" onclick="return confirm('确定清除所有记录？')">清除访客流水记录</a>
+        </div>
+    </div>
+</body>
+</html>
