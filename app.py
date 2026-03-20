@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
+from functools import wraps 
 import os
 
 app = Flask(__name__)
@@ -12,6 +13,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'gy
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # 检查 Session 中是否有管理员标记
+        if not session.get('is_admin'):
+            flash("越权访问：请先以管理员账号 (admin) 登录！", "danger")
+            return redirect(url_for('user_main'))
+        return f(*args, **kwargs)
+    return decorated_function
 # --- 数据库模型 ---
 class Member(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,6 +68,12 @@ def user_main():
 @app.route('/user/login', methods=['POST'])
 def user_login():
     phone = request.form.get('phone')
+    # 【新增逻辑】：判定管理员登录
+    if phone == 'admin':
+        session['is_admin'] = True  # 赋予管理员权限
+        session['member_id'] = None # 管理员不需要关联具体的会员ID
+        flash("管理员登录成功！已开启管理权限。", "success")
+        return redirect(url_for('admin_dashboard')) # 登录后直接跳转管理后台
     user = Member.query.filter_by(phone=phone).first()
     if user:
         session['member_id'] = user.id
@@ -83,11 +99,27 @@ def user_register():
 def user_upgrade():
     user = Member.query.get(session.get('member_id'))
     if user:
+        today = date.today()
+        
+        # 【核心修复逻辑】：检查是否已有尚未过期的有效时长
+        if user.expiry_date and user.expiry_date > today:
+            # 如果还没过期，在原有效期基础上累加 365 天
+            user.expiry_date = user.expiry_date + timedelta(days=365)
+            action_name = "续费高级会员"
+        else:
+            # 如果是首次升级或已过期，从今天起算 365 天
+            user.expiry_date = today + timedelta(days=365)
+            action_name = "升级高级会员"
+            
         user.level = "高级会员"
-        user.expiry_date = date.today() + timedelta(days=365)
-        db.session.add(Transaction(amount=1688.0, item_name="升级高级会员", member_name=user.name, category="会员业务"))
+        
+        # 记录财务流水时区分是升级还是续费
+        db.session.add(Transaction(amount=1688.0, item_name=action_name, member_name=user.name, category="会员业务"))
         db.session.commit()
-        flash("升级成功！您已获得全部权限。", "warning")
+        
+        # 友好的弹窗提示，展示具体的到期时间
+        flash(f"{action_name}成功！您的会员权限已延期至 {user.expiry_date.strftime('%Y-%m-%d')}。", "warning")
+        
     return redirect(url_for('user_main'))
 
 @app.route('/user/action', methods=['POST'])
@@ -136,7 +168,19 @@ def user_logout():
 
 # ================= 管理端 =================
 
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # 检查 session 中是否有我们刚才设置的 is_admin 标记
+        if not session.get('is_admin'):
+            flash("越权访问：请先以管理员账号 (admin) 登录！", "danger")
+            return redirect(url_for('user_main'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/admin/dashboard')
+@admin_required
 def admin_dashboard():
     # 统计数据
     in_total = Attendance.query.count()
@@ -144,6 +188,7 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', in_total=in_total, out_total=out_total)
 
 @app.route('/admin/clear_attendance')
+@admin_required
 def clear_attendance():
     Attendance.query.delete()
     db.session.commit()
@@ -151,6 +196,7 @@ def clear_attendance():
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/members')
+@admin_required
 def admin_members():
     members = Member.query.all()
     n_count = Member.query.filter_by(level="普通会员").count()
@@ -158,6 +204,7 @@ def admin_members():
     return render_template('admin_members.html', members=members, n_count=n_count, s_count=s_count)
 
 @app.route('/admin/add_member', methods=['POST'])
+@admin_required
 def admin_add_member():
     name, phone, level = request.form.get('name'), request.form.get('phone'), request.form.get('level')
     expiry = date.today() + timedelta(days=365) if level == "高级会员" else None
@@ -166,24 +213,28 @@ def admin_add_member():
     return redirect(url_for('admin_members'))
 
 @app.route('/admin/member/delete/<int:id>')
+@admin_required
 def delete_member(id):
     m = Member.query.get(id)
     if m: db.session.delete(m); db.session.commit()
     return redirect(url_for('admin_members'))
 
 @app.route('/admin/member/delete_all')
+@admin_required
 def delete_all_members():
     Member.query.delete()
     db.session.commit()
     return redirect(url_for('admin_members'))
 
 @app.route('/admin/finance')
+@admin_required
 def admin_finance():
     trans = Transaction.query.order_by(Transaction.date.desc()).all()
     total_income = db.session.query(db.func.sum(Transaction.amount)).scalar() or 0
     return render_template('admin_finance.html', trans=trans, total_income=total_income)
 
 @app.route('/admin/finance/delete/<int:id>')
+@admin_required
 def delete_finance(id):
     t = Transaction.query.get(id)
     if t: db.session.delete(t); db.session.commit()
@@ -191,6 +242,7 @@ def delete_finance(id):
 
 # 将这段代码添加到 app.py 的“管理员端路由”部分
 @app.route('/admin/finance/clear_all')
+@admin_required
 def clear_all_finance():
     Transaction.query.delete()
     db.session.commit()
@@ -198,6 +250,7 @@ def clear_all_finance():
     return redirect(url_for('admin_finance'))
 
 @app.route('/admin/finance/delete_all')
+@admin_required
 def delete_all_finance():
     Transaction.query.delete()
     db.session.commit()
