@@ -1,0 +1,91 @@
+<div class="modal-mask" id="profileModal">
+    <div class="profile-modal">
+        <div class="modal-header">
+            <div class="modal-title">个人资料</div>
+            <button class="close-btn" onclick="closeProfileModal()">×</button>
+        </div>
+
+        <form method="post" action="{{ url_for('update_profile') }}">
+            <div class="modal-body">
+                <div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>姓名</label>
+                            <input type="text" name="name" value="{{ user.name or '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>年龄</label>
+                            <input type="number" name="age" value="{{ user.age or '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>性别</label>
+                            <select name="gender">
+                                <option value="">请选择</option>
+                                <option value="男" {% if user.gender=='男' %}selected{% endif %}>男</option>
+                                <option value="女" {% if user.gender=='女' %}selected{% endif %}>女</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>生日</label>
+                            <input type="date" name="birthday" value="{{ user.birthday.strftime('%Y-%m-%d') if user.birthday else '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>身高(cm)</label>
+                            <input type="number" step="0.1" name="height" value="{{ user.height or '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>体重(kg)</label>
+                            <input type="number" step="0.1" name="weight" value="{{ user.weight or '' }}">
+                        </div>
+
+                        <div class="form-group full">
+                            <label>备注</label>
+                            <textarea name="profile_note" placeholder="可填写训练目标、身体情况等">{{ user.profile_note or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="info-card">
+                        <h4>会员与课程信息</h4>
+
+                        <div class="info-row">
+                            <div class="info-label">会员等级</div>
+                            <div class="info-value">{{ user.level }}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">高级会员有效期</div>
+                            <div class="info-value">{{ user.expiry_date.strftime('%Y-%m-%d') if user.expiry_date else '--' }}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">私教课程有效期</div>
+                            <div class="info-value">{{ user.private_course_expiry.strftime('%Y-%m-%d') if user.private_course_expiry else '--' }}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">体操课程有效期</div>
+                            <div class="info-value">{{ user.gymnastics_expiry.strftime('%Y-%m-%d') if user.gymnastics_expiry else '--' }}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">联系电话</div>
+                            <div class="info-value">{{ user.phone }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-dark" onclick="closeProfileModal()">取消</button>
+                <button type="submit" class="btn-gold">保存资料</button>
+            </div>
+        </form>
+    </div>
+</div>

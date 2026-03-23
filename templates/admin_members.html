@@ -1,35 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>会员档案 - 力量健身后台</title>
+    <title>会员档案管理 - 力量后台</title>
     <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css">
     <style>
-        :root { --accent: #ff8c00; --bg: #0b0b0b; --sidebar-bg: #000; --glass: rgba(255,255,255,0.05); }
+        :root {
+            --accent: #ff9f2f;
+            --bg: #0b0b0b;
+            --sidebar-bg: #000;
+            --panel: #1f1f1f;
+            --line: #2f2f2f;
+        }
         body { background: var(--bg); color: #fff; font-family: 'PingFang SC', sans-serif; }
-        
-        /* 侧边栏保持一致 */
         .sidebar { width: 260px; background: var(--sidebar-bg); position: fixed; height: 100vh; padding: 30px 20px; border-right: 1px solid #222; }
         .main-content { margin-left: 260px; padding: 40px; }
-        .nav-link { color: #888; padding: 12px; border-radius: 12px; margin-bottom: 8px; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { background: var(--glass); color: var(--accent); }
+        .brand { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 42px; }
+        .nav-link { color: #888; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px; transition: 0.3s; font-size: 17px; font-weight: 600; }
+        .nav-link:hover { background: #1b1b1b; color: var(--accent); }
         .nav-link.active { background: var(--accent); color: #000; font-weight: bold; }
-        
-        /* 玻璃卡片 */
-        .glass-card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); padding: 25px; }
-        .stat-val { font-size: 2rem; font-weight: 800; color: var(--accent); }
-        
-        /* 表格美化 */
-        .table { color: #ccc; border-color: #333; }
-        .table-hover tbody tr:hover { background: rgba(255,140,0,0.05) !important; color: #fff; }
-        .form-control, .form-select { background: #1a1a1a !important; border: 1px solid #333 !important; color: #fff !important; }
-        .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(255,140,0,0.25); border-color: var(--accent) !important; }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 24px; }
+        .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 24px; padding: 28px; text-align: center; }
+        .stat-title { color: #7f858d; font-size: 16px; margin-bottom: 10px; }
+        .stat-val { font-size: 2.6rem; font-weight: 900; color: var(--accent); }
+        .text-gold { color: #f7c843 !important; }
+        .form-control, .form-select { background: #1f1f1f !important; border: 1px solid #333 !important; color: #fff !important; height: 50px; border-radius: 10px; }
+        .form-control:focus, .form-select:focus { box-shadow: 0 0 0 0.2rem rgba(255,159,47,.18); border-color: var(--accent) !important; }
+        .btn-gold { background: #f7c843; color: #000; font-weight: 800; border: none; border-radius: 10px; height: 50px; }
+        .custom-table { overflow: hidden; border-radius: 22px; border: 1px solid #353535; background: #24272b; }
+        .table { color: #d8d8d8; margin-bottom: 0; }
+        .table thead tr { background: #2a2d31; color: #7f858d; }
+        .table td, .table th { padding: 16px 18px; border-color: #3a3a3a !important; vertical-align: middle; }
+        .badge-gold { background: #f7c843; color: #000; font-weight: 800; padding: 7px 14px; border-radius: 8px; }
+        .click-name { color: #fff; font-weight: 800; text-decoration: none; cursor: pointer; }
+        .click-name:hover { color: var(--accent); }
+        .trash-btn { color: #ff5c67; font-size: 18px; }
+
+        .member-modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .member-modal-mask.show { display: flex; }
+        .member-modal { width: 860px; max-width: 100%; background: #171717; border: 1px solid #313131; border-radius: 24px; overflow: hidden; }
+        .member-modal-header { padding: 20px 24px; border-bottom: 1px solid #2b2b2b; display: flex; justify-content: space-between; align-items: center; }
+        .member-modal-title { font-size: 24px; font-weight: 900; color: var(--accent); }
+        .member-close { background: transparent; border: none; color: #aaa; font-size: 28px; cursor: pointer; }
+        .member-modal-body { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .info-box { background: #202020; border: 1px solid #2f2f2f; border-radius: 18px; padding: 18px; }
+        .info-box h5 { color: #f7c843; margin-bottom: 14px; font-weight: 800; }
+        .info-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #2e2e2e; font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #8f96a0; }
+        .info-value { color: #fff; font-weight: 700; }
+        .note-box { min-height: 120px; white-space: pre-wrap; color: #ddd; line-height: 1.8; }
+
+        @media (max-width: 900px) {
+            .member-modal-body { grid-template-columns: 1fr; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .sidebar { position: relative; width: 100%; height: auto; }
+        }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h4 class="mb-5 fw-bold text-orange"><i class="fas fa-dumbbell me-2"></i>力量后台</h4>
+        <div class="brand"><i class="fas fa-dumbbell me-2 text-warning"></i>力量后台</div>
         <nav class="nav flex-column">
             <a class="nav-link" href="/admin/dashboard"><i class="fas fa-chart-pie me-2"></i>数据仪表盘</a>
             <a class="nav-link active" href="/admin/members"><i class="fas fa-users me-2"></i>会员档案管理</a>
@@ -47,21 +79,21 @@
 
         <div class="row g-4 mb-4 text-center">
             <div class="col-md-6">
-                <div class="glass-card">
-                    <p class="text-muted mb-1">普通会员</p>
+                <div class="stat-card">
+                    <div class="stat-title">普通会员</div>
                     <div class="stat-val">{{ n_count }}</div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="glass-card">
-                    <p class="text-muted mb-1">高级会员 (Premium)</p>
-                    <div class="stat-val text-warning">{{ s_count }}</div>
+                <div class="stat-card">
+                    <div class="stat-title">高级会员 (Premium)</div>
+                    <div class="stat-val text-gold">{{ s_count }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="glass-card mb-4">
-            <h5 class="mb-3 text-orange"><i class="fas fa-user-plus me-2"></i>手动登记会员</h5>
+        <div class="panel mb-4">
+            <h4 class="mb-3 fw-bold"><i class="fas fa-user-plus me-2"></i>手动登记会员</h4>
             <form action="/admin/add_member" method="POST" class="row g-3">
                 <div class="col-md-3">
                     <input name="name" class="form-control" placeholder="姓名" required>
@@ -76,14 +108,14 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-warning w-100 fw-bold py-2">确认入库</button>
+                    <button class="btn-gold w-100">确认入库</button>
                 </div>
             </form>
         </div>
 
-        <div class="glass-card p-0 overflow-hidden">
+        <div class="custom-table">
             <table class="table table-dark table-hover mb-0">
-                <thead class="bg-dark text-muted">
+                <thead>
                     <tr>
                         <th class="ps-4">ID</th>
                         <th>姓名</th>
@@ -97,16 +129,18 @@
                     {% for m in members %}
                     <tr>
                         <td class="ps-4 text-muted">{{ m.id }}</td>
-                        <td class="fw-bold">{{ m.name }}</td>
+                        <td><a class="click-name" onclick="openMemberModal({{ m.id }})">{{ m.name }}</a></td>
                         <td>{{ m.phone }}</td>
                         <td>
-                            <span class="badge {% if m.level=='高级会员' %}bg-warning text-dark{% else %}bg-secondary{% endif %} px-3">
-                                {{ m.level }}
-                            </span>
+                            {% if m.level == '高级会员' %}
+                                <span class="badge-gold">{{ m.level }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary px-3 py-2">{{ m.level }}</span>
+                            {% endif %}
                         </td>
                         <td><small class="text-muted">{{ m.expiry_date or '--' }}</small></td>
                         <td class="text-center">
-                            <a href="/admin/member/delete/{{ m.id }}" class="text-danger" onclick="return confirm('确定要移除该会员档案？')">
+                            <a href="/admin/member/delete/{{ m.id }}" class="trash-btn" onclick="return confirm('确定要移除该会员档案？')">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>
@@ -116,5 +150,69 @@
             </table>
         </div>
     </div>
+
+    <div class="member-modal-mask" id="memberModal">
+        <div class="member-modal">
+            <div class="member-modal-header">
+                <div class="member-modal-title">会员详细资料</div>
+                <button class="member-close" onclick="closeMemberModal()">×</button>
+            </div>
+
+            <div class="member-modal-body">
+                <div class="info-box">
+                    <h5>基础信息</h5>
+                    <div class="info-row"><div class="info-label">姓名</div><div class="info-value" id="m_name">--</div></div>
+                    <div class="info-row"><div class="info-label">手机号</div><div class="info-value" id="m_phone">--</div></div>
+                    <div class="info-row"><div class="info-label">年龄</div><div class="info-value" id="m_age">--</div></div>
+                    <div class="info-row"><div class="info-label">性别</div><div class="info-value" id="m_gender">--</div></div>
+                    <div class="info-row"><div class="info-label">身高(cm)</div><div class="info-value" id="m_height">--</div></div>
+                    <div class="info-row"><div class="info-label">体重(kg)</div><div class="info-value" id="m_weight">--</div></div>
+                    <div class="info-row"><div class="info-label">生日</div><div class="info-value" id="m_birthday">--</div></div>
+                </div>
+
+                <div class="info-box">
+                    <h5>会员与课程信息</h5>
+                    <div class="info-row"><div class="info-label">会员等级</div><div class="info-value" id="m_level">--</div></div>
+                    <div class="info-row"><div class="info-label">高级会员有效期</div><div class="info-value" id="m_expiry">--</div></div>
+                    <div class="info-row"><div class="info-label">私教课程有效期</div><div class="info-value" id="m_private_expiry">--</div></div>
+                    <div class="info-row"><div class="info-label">体操课程有效期</div><div class="info-value" id="m_gym_expiry">--</div></div>
+
+                    <h5 class="mt-4">备注信息</h5>
+                    <div class="note-box" id="m_note">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openMemberModal(id) {
+            fetch(`/admin/member/${id}/json`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('m_name').innerText = data.name || '--';
+                    document.getElementById('m_phone').innerText = data.phone || '--';
+                    document.getElementById('m_age').innerText = data.age || '--';
+                    document.getElementById('m_gender').innerText = data.gender || '--';
+                    document.getElementById('m_height').innerText = data.height || '--';
+                    document.getElementById('m_weight').innerText = data.weight || '--';
+                    document.getElementById('m_birthday').innerText = data.birthday || '--';
+                    document.getElementById('m_level').innerText = data.level || '--';
+                    document.getElementById('m_expiry').innerText = data.expiry_date || '--';
+                    document.getElementById('m_private_expiry').innerText = data.private_course_expiry || '--';
+                    document.getElementById('m_gym_expiry').innerText = data.gymnastics_expiry || '--';
+                    document.getElementById('m_note').innerText = data.profile_note || '--';
+                    document.getElementById('memberModal').classList.add('show');
+                });
+        }
+
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('show');
+        }
+
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('memberModal');
+            if (e.target === modal) closeMemberModal();
+        });
+    </script>
 </body>
 </html>

@@ -2,169 +2,229 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <title>POWER GYM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POWER GYM - 力量健身</title>
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .text-orange { color: #ff8c00; }
-        .hero { 
-            padding: 60px 0; 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1350'); 
-            background-size: cover; 
-            background-position: center;
-            border-radius: 0 0 40px 40px; 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft YaHei", Arial, sans-serif; }
+        body { background: #000; color: #fff; }
+        .container { width: 1320px; max-width: 92%; margin: 0 auto; padding: 28px 0 60px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .logo { font-size: 34px; font-weight: 900; color: #ff9f2f; display: flex; align-items: center; gap: 12px; }
+        .top-actions { display: flex; gap: 12px; align-items: center; }
+        .top-btn { text-decoration: none; border: none; padding: 12px 18px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .admin-btn { background: #f7c843; color: #000; }
+        .logout-btn { background: #d94b57; color: #fff; }
+        .profile-icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid #333; background: #1f1f1f; color: #fff; font-size: 22px; cursor: pointer; }
+        .flash { padding: 14px 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; }
+        .success { background: rgba(46,204,113,.12); color: #7ef0a8; border: 1px solid rgba(46,204,113,.2); }
+        .danger { background: rgba(231,76,60,.12); color: #ff9085; border: 1px solid rgba(231,76,60,.2); }
+        .warning { background: rgba(247,200,67,.12); color: #ffd86c; border: 1px solid rgba(247,200,67,.2); }
+        .info { background: rgba(52,152,219,.12); color: #7fc8ff; border: 1px solid rgba(52,152,219,.2); }
+        .auth-page { min-height: calc(100vh - 120px); display: flex; justify-content: center; align-items: center; }
+        .auth-card { width: 680px; max-width: 100%; background: #1f1f1f; border: 1px solid #303030; border-radius: 28px; padding: 56px 60px; }
+        .auth-card h1 { text-align: center; font-size: 54px; margin-bottom: 34px; font-weight: 900; }
+        .auth-input { width: 100%; height: 58px; border: none; border-radius: 6px; background: #2a2d31; color: #fff; padding: 0 18px; font-size: 16px; margin-bottom: 18px; outline: none; }
+        .auth-input::placeholder { color: #767d87; }
+        .auth-main-btn { width: 100%; height: 58px; border: none; border-radius: 6px; background: #f7c843; color: #000; font-size: 17px; font-weight: 800; cursor: pointer; margin-bottom: 26px; }
+        .divider { display: flex; align-items: center; gap: 18px; color: #727782; margin: 18px 0 26px; font-size: 18px; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #353535; }
+        .auth-sub-btn { width: 100%; height: 58px; border-radius: 6px; background: transparent; color: #fff; border: 1px solid #a9a9a9; font-size: 17px; font-weight: 800; cursor: pointer; }
+        .hero { position: relative; height: 360px; border-radius: 36px; overflow: hidden; margin-bottom: 46px; background: #161616; }
+        .hero img { width: 100%; height: 100%; object-fit: cover; filter: brightness(35%); }
+        .hero-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px 60px; }
+        .hero-content { width: 100%; max-width: 760px; }
+        .hero-title { font-size: 72px; font-weight: 900; margin-bottom: 18px; line-height: 1.1; }
+        .hero-line { font-size: 30px; margin-bottom: 24px; font-weight: 700; }
+        .highlight { color: #ff9f2f; }
+        .hero-expiry { color: #a0a7af; font-size: 18px; font-weight: 600; }
+        .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+        .card-btn { display: block; width: 100%; background: #1f1f1f; border: none; border-radius: 26px; padding: 34px 18px 30px; text-align: center; color: #fff; text-decoration: none; cursor: pointer; min-height: 205px; transition: transform .2s ease, background .2s ease; }
+        .card-btn:hover { transform: translateY(-4px); background: #252525; }
+        .card-btn.disabled { opacity: .55; cursor: not-allowed; }
+        .card-btn.disabled:hover { transform: none; background: #1f1f1f; }
+        .card-icon { font-size: 56px; margin-bottom: 18px; display: block; }
+        .blue { color: #3b82f6; }
+        .green { color: #4ea56d; }
+        .cyan { color: #8b5cf6; }
+        .yellow { color: #f7c843; }
+        .card-title { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+        .card-sub { color: #9ca3af; font-size: 15px; font-weight: 600; }
+
+        .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-mask.show { display: flex; }
+        .profile-modal { width: 820px; max-width: 100%; background: #171717; border: 1px solid #313131; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 24px; font-weight: 900; color: #ff9f2f; }
+        .close-btn { background: transparent; border: none; color: #aaa; font-size: 28px; cursor: pointer; }
+        .modal-body { padding: 24px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group label { display: block; font-size: 13px; color: #aaa; margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; background: #24272b; border: 1px solid #343434; color: #fff; border-radius: 10px; padding: 12px 14px; outline: none; }
+        .form-group textarea { min-height: 90px; resize: vertical; }
+        .full { grid-column: 1 / -1; }
+        .info-card { background: #202020; border: 1px solid #313131; border-radius: 18px; padding: 18px; }
+        .info-card h4 { margin-bottom: 16px; font-size: 18px; color: #f7c843; }
+        .info-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2d2d2d; font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #9ca3af; }
+        .info-value { color: #fff; font-weight: 700; }
+        .modal-footer { padding: 20px 24px; border-top: 1px solid #2a2a2a; display: flex; justify-content: flex-end; gap: 12px; }
+        .btn-dark { background: #252525; color: #fff; border: 1px solid #353535; border-radius: 10px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
+        .btn-gold { background: #f7c843; color: #000; border: none; border-radius: 10px; padding: 12px 18px; font-weight: 800; cursor: pointer; }
+
+        @media (max-width: 1200px) {
+            .cards { grid-template-columns: repeat(2, 1fr); }
+            .hero-title { font-size: 54px; }
         }
-        .glass { 
-            background: rgba(255,255,255,0.1); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 20px; 
-            padding: 25px; 
+        @media (max-width: 900px) { .modal-body { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .topbar { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .auth-card { padding: 34px 24px; }
+            .auth-card h1 { font-size: 34px; }
+            .hero { height: 300px; border-radius: 24px; }
+            .hero-overlay { padding: 20px 24px; }
+            .hero-title { font-size: 40px; }
+            .hero-line { font-size: 22px; }
+            .cards { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
         }
-        .card-btn { transition: 0.3s; cursor: pointer; border: 2px solid transparent; position: relative; }
-        .card-btn:hover { 
-            border-color: #ff8c00; 
-            background: rgba(255,140,0,0.1); 
-            transform: translateY(-5px); 
-        }
-        .alert-dismissible { border-radius: 15px; }
     </style>
 </head>
 <body>
-    <div class="container py-4">
-        <!-- [source: 6] 的顶部导航区域修改 -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-orange fw-bold m-0"><i class="fas fa-dumbbell me-2"></i>POWER GYM</h2>
-    <div>
-        {# --- 核心修改：只有管理员登录后才显示这个橙色按钮 --- #}
-        {% if session.get('is_admin') %}
-            <a href="/admin/dashboard" class="btn btn-warning btn-sm me-2">
-                <i class="fas fa-tachometer-alt me-1"></i> 返回管理后台
-            </a>
-        {% endif %}
-
-        {% if user or session.get('is_admin') %}
-            <a href="/user/logout" class="btn btn-danger btn-sm">注销</a>
-        {% endif %}
-    </div>
-</div>
-
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, message in messages %}
-                      <div class="alert alert-{{ category }} alert-dismissible fade show glass border-0 text-white mb-4" role="alert">
-                        <i class="fas {% if category=='danger' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-            </div>
-        </div>
-
-        {% if not user %}
-        <div class="row justify-content-center pt-5">
-            <div class="col-md-5 glass p-5 text-center">
-                <h3 class="mb-4 fw-bold">开启您的健力之旅</h3>
-                <form action="/user/login" method="POST" class="mb-4">
-                    <input name="phone" class="form-control bg-dark text-white border-0 mb-3 py-2" placeholder="手机号直接登录" required>
-                    <button class="btn btn-warning w-100 fw-bold py-2">会员登录</button>
-                </form>
-                <div class="d-flex align-items-center mb-4">
-                    <hr class="flex-grow-1 text-secondary"> <span class="mx-3 text-secondary">OR</span> <hr class="flex-grow-1 text-secondary">
-                </div>
-                <form action="/user/register" method="POST">
-                    <input name="name" class="form-control bg-dark text-white border-0 mb-3 py-2" placeholder="您的姓名" required>
-                    <input name="phone" class="form-control bg-dark text-white border-0 mb-3 py-2" placeholder="联系电话" required>
-                    <button class="btn btn-outline-light w-100 py-2">加入会员</button>
-                </form>
-            </div>
-        </div>
-        {% else %}
-        <div class="hero text-center mb-5 shadow-lg">
-            <h1 class="display-3 fw-bold">欢迎回来，{{ user.name }}</h1>
-            <p class="fs-4">身份状态：<span class="text-orange">{{ user.level }}</span></p>
-            
-            {% if user.level == '普通会员' %}
-                <div class="glass d-inline-block p-4 mt-3">
-                    <p class="mb-3">想要体验签到、私教等功能？</p>
-                    <form action="/user/upgrade" method="POST">
-                        <button class="btn btn-warning btn-lg px-5 fw-bold">立即升级高级会员 (￥1688/年)</button>
-                    </form>
-                </div>
-            {% else %}
-                <p class="text-white-50">有效期至：{{ user.expiry_date }}</p>
+<div class="container">
+    <div class="topbar">
+        <div class="logo"><span>▌▌</span><span>POWER GYM</span></div>
+        <div class="top-actions">
+            {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin_dashboard') }}" class="top-btn admin-btn">🧭 返回管理后台</a>
+            {% endif %}
+            {% if user %}
+                <button class="profile-icon-btn" onclick="openProfileModal()">👤</button>
+            {% endif %}
+            {% if user or session.get('is_admin') %}
+                <a href="{{ url_for('user_logout') }}" class="top-btn logout-btn">注销</a>
             {% endif %}
         </div>
-
-        <div class="row g-4 mb-5">
-            {% set items = [
-                ('签到','fa-map-pin','primary',0), 
-                ('签出','fa-sign-out-alt','success',0), 
-                ('办理私教','fa-user-tie','info',300), 
-                ('购买补剂','fa-pills','warning',150)
-            ] %}
-            
-            {% for name, icon, color, price in items %}
-            <div class="col-md-3">
-                <div class="glass text-center card-btn h-100" onclick="act('{{name}}', '{{price}}')">
-                    {% if user.level != '高级会员' %}
-                        <i class="fas fa-lock text-danger position-absolute top-0 end-0 m-3" title="限高级会员"></i>
-                    {% endif %}
-                    <i class="fas {{icon}} fa-3x text-{{color}} mb-3"></i>
-                    <h5 class="fw-bold">{{name}}</h5>
-                    {% if price > 0 %}
-                        <p class="text-white-50 small mb-0">费用：￥{{price}}</p>
-                    {% else %}
-                        <p class="text-white-50 small mb-0">免费项目</p>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
     </div>
 
-    <form id="actForm" action="/user/action" method="POST" style="display:none">
-        <input name="action" id="a_name">
-        <input name="price" id="a_price">
-    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function act(name, price) {
-            const userLevel = "{{ user.level if user else '' }}";
-            
-            if (userLevel !== "高级会员") {
-                alert('抱歉，该功能仅限“高级会员”使用。请先办理会员升级！');
-                return;
-            }
+    {% if user %}
+        <div class="hero">
+            <img src="{{ url_for('static', filename='images/gym_banner.jpg') }}" alt="banner">
+            <div class="hero-overlay">
+                <div class="hero-content">
+                    <div class="hero-title">欢迎回来，{{ user.name }}</div>
+                    <div class="hero-line">
+                        身份状态：
+                        {% if vip_active %}
+                            <span class="highlight">高级会员</span>
+                        {% else %}
+                            <span style="color:#d1d5db;">普通会员</span>
+                        {% endif %}
+                    </div>
+                    <div class="hero-expiry">
+                        {% if vip_active %}
+                            有效期至：{{ user.expiry_date.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            当前尚未开通高级会员，请前往业务办理
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            let confirmMsg = '确认进行 [' + name + '] 吗？';
-            if (parseFloat(price) > 0) {
-                confirmMsg = '确认办理 [' + name + ']？将从财务记录录入费用 ￥' + price;
-            }
+        <div class="cards">
+            {% if vip_active %}
+                <form method="post" action="{{ url_for('user_action') }}">
+                    <input type="hidden" name="action" value="签到">
+                    <button class="card-btn" type="submit">
+                        <span class="card-icon blue">●</span>
+                        <div class="card-title">签到</div>
+                        <div class="card-sub">免费项目</div>
+                    </button>
+                </form>
+            {% else %}
+                <button class="card-btn disabled" type="button" onclick="alert('普通会员暂不能使用签到，请先办理高级会员。')">
+                    <span class="card-icon blue">●</span>
+                    <div class="card-title">签到</div>
+                    <div class="card-sub">仅高级会员可用</div>
+                </button>
+            {% endif %}
 
-            if(confirm(confirmMsg)) {
-                document.getElementById('a_name').value = name;
-                document.getElementById('a_price').value = price;
-                document.getElementById('actForm').submit();
-            }
-        }
+            {% if vip_active %}
+                <form method="post" action="{{ url_for('user_action') }}">
+                    <input type="hidden" name="action" value="签出">
+                    <button class="card-btn" type="submit">
+                        <span class="card-icon green">↪</span>
+                        <div class="card-title">签出</div>
+                        <div class="card-sub">免费项目</div>
+                    </button>
+                </form>
+            {% else %}
+                <button class="card-btn disabled" type="button" onclick="alert('普通会员暂不能使用签出，请先办理高级会员。')">
+                    <span class="card-icon green">↪</span>
+                    <div class="card-title">签出</div>
+                    <div class="card-sub">仅高级会员可用</div>
+                </button>
+            {% endif %}
 
-        // 自动关闭提示框
-        setTimeout(function() {
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                let bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000); // 5秒后自动关闭
-    </script>
+            <a href="{{ url_for('user_business') }}" class="card-btn">
+                <span class="card-icon cyan">👤</span>
+                <div class="card-title">业务办理</div>
+                <div class="card-sub">会员 / 私教 / 体操课</div>
+            </a>
+
+            <a href="{{ url_for('user_supplements') }}" class="card-btn">
+                <span class="card-icon yellow">💊</span>
+                <div class="card-title">购买补剂</div>
+                <div class="card-sub">蛋白粉 / 肌酸等</div>
+            </a>
+        </div>
+
+        {% include 'partials/profile_modal.html' %}
+
+    {% else %}
+        <div class="auth-page">
+            <div class="auth-card">
+                <h1>开启您的健力之旅</h1>
+
+                <form method="post" action="{{ url_for('user_login') }}">
+                    <input class="auth-input" type="text" name="phone" placeholder="手机号直接登录" required>
+                    <button class="auth-main-btn" type="submit">会员登录</button>
+                </form>
+
+                <div class="divider">OR</div>
+
+                <form method="post" action="{{ url_for('user_register') }}">
+                    <input class="auth-input" type="text" name="name" placeholder="您的姓名" required>
+                    <input class="auth-input" type="text" name="phone" placeholder="联系电话" required>
+                    <button class="auth-sub-btn" type="submit">加入会员</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function openProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) modal.classList.add('show');
+}
+function closeProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) modal.classList.remove('show');
+}
+window.addEventListener('click', function(e) {
+    const modal = document.getElementById('profileModal');
+    if (modal && e.target === modal) closeProfileModal();
+});
+</script>
 </body>
 </html>

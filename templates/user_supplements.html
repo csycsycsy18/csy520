@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>补品购买 - POWER GYM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft YaHei", Arial, sans-serif; }
+        body { background: #000; color: #fff; }
+        .container { width: 1320px; max-width: 92%; margin: 0 auto; padding: 28px 0 60px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; }
+        .logo { font-size: 34px; font-weight: 900; color: #ff9f2f; display: flex; align-items: center; gap: 12px; }
+        .top-right { display: flex; gap: 14px; align-items: center; }
+        .btn-top { text-decoration: none; border: none; padding: 12px 18px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .btn-back { background: #f7c843; color: #000; }
+        .btn-home { background: #222; color: #fff; }
+        .profile-icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid #333; background: #1f1f1f; color: #fff; font-size: 22px; cursor: pointer; }
+        .page-title { font-size: 38px; font-weight: 900; margin-bottom: 22px; }
+        .intro-box { background: #1f1f1f; border: 1px solid #2d2d2d; border-radius: 24px; padding: 22px 24px; margin-bottom: 30px; }
+        .intro-box p { color: #afb6bf; margin-top: 10px; font-size: 16px; }
+        .flash { padding: 14px 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; }
+        .success { background: rgba(46,204,113,.12); color: #7ef0a8; border: 1px solid rgba(46,204,113,.2); }
+        .danger { background: rgba(231,76,60,.12); color: #ff9085; border: 1px solid rgba(231,76,60,.2); }
+        .warning { background: rgba(247,200,67,.12); color: #ffd86c; border: 1px solid rgba(247,200,67,.2); }
+        .info { background: rgba(52,152,219,.12); color: #7fc8ff; border: 1px solid rgba(52,152,219,.2); }
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+        .supp-card { background: #1f1f1f; border-radius: 26px; overflow: hidden; border: 1px solid #2c2c2c; }
+        .supp-card img { width: 100%; height: 220px; object-fit: cover; filter: brightness(78%); }
+        .supp-body { padding: 22px; }
+        .supp-title { font-size: 26px; font-weight: 900; margin-bottom: 10px; }
+        .supp-desc { color: #9ca3af; line-height: 1.7; font-size: 14px; min-height: 70px; margin-bottom: 14px; }
+        .supp-price { color: #f7c843; font-size: 24px; font-weight: 900; margin-bottom: 14px; }
+        .buy-row { display: flex; gap: 12px; }
+        .qty-input { width: 90px; height: 46px; border-radius: 8px; border: none; background: #2a2d31; color: #fff; padding: 0 12px; font-size: 15px; }
+        .buy-btn { flex: 1; height: 46px; border: none; border-radius: 8px; background: #f7c843; color: #000; font-size: 15px; font-weight: 800; cursor: pointer; }
+        .buy-btn:hover { opacity: 0.95; }
+
+        .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-mask.show { display: flex; }
+        .profile-modal { width: 820px; max-width: 100%; background: #171717; border: 1px solid #313131; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 24px; font-weight: 900; color: #ff9f2f; }
+        .close-btn { background: transparent; border: none; color: #aaa; font-size: 28px; cursor: pointer; }
+        .modal-body { padding: 24px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group label { display: block; font-size: 13px; color: #aaa; margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; background: #24272b; border: 1px solid #343434; color: #fff; border-radius: 10px; padding: 12px 14px; outline: none; }
+        .form-group textarea { min-height: 90px; resize: vertical; }
+        .full { grid-column: 1 / -1; }
+        .info-card { background: #202020; border: 1px solid #313131; border-radius: 18px; padding: 18px; }
+        .info-card h4 { margin-bottom: 16px; font-size: 18px; color: #f7c843; }
+        .info-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2d2d2d; font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #9ca3af; }
+        .info-value { color: #fff; font-weight: 700; }
+        .modal-footer { padding: 20px 24px; border-top: 1px solid #2a2a2a; display: flex; justify-content: flex-end; gap: 12px; }
+        .btn-dark { background: #252525; color: #fff; border: 1px solid #353535; border-radius: 10px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
+        .btn-gold { background: #f7c843; color: #000; border: none; border-radius: 10px; padding: 12px 18px; font-weight: 800; cursor: pointer; }
+
+        @media (max-width: 1100px) { .cards { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .modal-body { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .topbar { flex-direction: column; align-items: flex-start; gap: 16px; } .page-title { font-size: 30px; } .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="topbar">
+        <div class="logo"><span>▌▌</span><span>POWER GYM</span></div>
+        <div class="top-right">
+            <a href="{{ url_for('user_main') }}" class="btn-top btn-home">返回首页</a>
+            {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-top btn-back">返回管理后台</a>
+            {% endif %}
+            {% if user %}
+                <button class="profile-icon-btn" onclick="openProfileModal()">👤</button>
+            {% endif %}
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="page-title">补品购买</div>
+
+    <div class="intro-box">
+        <h2>补剂商城</h2>
+        <p>所有会员都可以购买补剂，适合训练恢复、力量提升和日常营养补充。</p>
+    </div>
+
+    <div class="cards">
+        {% for item, price in supplement_pricing.items() %}
+        <div class="supp-card">
+
+{% if item == '乳清蛋白粉' %}
+  <img src="{{ url_for('static', filename='images/whey.jpg') }}" alt="{{ item }}">
+{% elif item == '肌酸' %}
+  <img src="{{ url_for('static', filename='images/creatine.jpg') }}" alt="{{ item }}">
+{% elif item == '氮泵' %}
+  <img src="{{ url_for('static', filename='images/preworkout.jpg') }}" alt="{{ item }}">
+{% elif item == '支链氨基酸BCAA' %}
+  <img src="{{ url_for('static', filename='images/creatine.jpg') }}" alt="{{ item }}">
+{% elif item == '左旋肉碱' %}
+  <img src="{{ url_for('static', filename='images/preworkout.jpg') }}" alt="{{ item }}">
+{% elif item == '维生素复合片' %}
+  <img src="{{ url_for('static', filename='images/creatine.jpg') }}" alt="{{ item }}">
+{% else %}
+  <img src="{{ url_for('static', filename='images/gym_banner.jpg') }}" alt="{{ item }}">
+{% endif %}
+
+
+            <div class="supp-body">
+                <div class="supp-title">{{ item }}</div>
+
+                <div class="supp-desc">
+                    {% if item == '乳清蛋白粉' %}
+                        训练后补充优质蛋白，有助于肌肉恢复与增长。
+                    {% elif item == '肌酸' %}
+                        适合高强度力量训练，帮助提升爆发力与训练表现。
+                    {% elif item == '氮泵' %}
+                        常用于训练前补充，提升专注度和训练状态。
+                    {% elif item == '支链氨基酸BCAA' %}
+                        适合训练前后营养支持，帮助保持训练状态。
+                    {% elif item == '左旋肉碱' %}
+                        常搭配减脂训练及饮食管理使用。
+                    {% elif item == '维生素复合片' %}
+                        用于日常营养补充，维持良好身体状态。
+                    {% else %}
+                        健身补剂商品。
+                    {% endif %}
+                </div>
+
+                <div class="supp-price">¥{{ price }}</div>
+
+                <form method="post" action="{{ url_for('buy_supplement') }}">
+                    <input type="hidden" name="item_name" value="{{ item }}">
+                    <div class="buy-row">
+                        <input class="qty-input" type="number" name="qty" min="1" value="1">
+                        <button class="buy-btn" type="submit">立即购买</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% include 'partials/profile_modal.html' %}
+</div>
+
+<script>
+function openProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) modal.classList.add('show');
+}
+function closeProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) modal.classList.remove('show');
+}
+window.addEventListener('click', function(e) {
+    const modal = document.getElementById('profileModal');
+    if (modal && e.target === modal) closeProfileModal();
+});
+</script>
+</body>
+</html>

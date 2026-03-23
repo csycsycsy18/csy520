@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>业务办理 - POWER GYM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft YaHei", Arial, sans-serif; }
+        body { background: #000; color: #fff; }
+        .container { width: 1320px; max-width: 92%; margin: 0 auto; padding: 28px 0 60px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; }
+        .logo { font-size: 34px; font-weight: 900; color: #ff9f2f; display: flex; align-items: center; gap: 12px; }
+        .top-right { display: flex; gap: 14px; align-items: center; }
+        .btn-top { text-decoration: none; border: none; padding: 12px 18px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .btn-back { background: #f7c843; color: #000; }
+        .btn-home { background: #222; color: #fff; }
+        .profile-icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid #333; background: #1f1f1f; color: #fff; font-size: 22px; cursor: pointer; }
+        .page-title { font-size: 38px; font-weight: 900; margin-bottom: 22px; }
+        .status-box { background: #1f1f1f; border: 1px solid #2d2d2d; border-radius: 24px; padding: 22px 24px; margin-bottom: 30px; }
+        .status-box p { color: #afb6bf; margin-top: 10px; font-size: 16px; }
+        .tag { display: inline-block; margin-top: 14px; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 800; }
+        .tag.vip { background: rgba(255,159,47,0.12); color: #ffb04f; border: 1px solid rgba(255,159,47,0.22); }
+        .tag.normal { background: rgba(255,255,255,0.06); color: #d1d5db; border: 1px solid rgba(255,255,255,0.08); }
+        .flash { padding: 14px 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; }
+        .success { background: rgba(46, 204, 113, 0.12); color: #7ef0a8; border: 1px solid rgba(46, 204, 113, 0.2); }
+        .danger { background: rgba(231, 76, 60, 0.12); color: #ff9085; border: 1px solid rgba(231, 76, 60, 0.2); }
+        .warning { background: rgba(247, 200, 67, 0.12); color: #ffd86c; border: 1px solid rgba(247, 200, 67, 0.2); }
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+        .service-card { background: #1f1f1f; border-radius: 26px; overflow: hidden; border: 1px solid #2c2c2c; }
+        .service-card img { width: 100%; height: 220px; object-fit: cover; filter: brightness(75%); }
+        .service-body { padding: 22px; }
+        .service-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+        .service-desc { color: #9ca3af; line-height: 1.7; font-size: 14px; margin-bottom: 18px; }
+        .plan-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-top: 1px solid #313131; gap: 10px; }
+        .plan-left { font-size: 16px; font-weight: 700; }
+        .price { color: #f7c843; margin-left: 8px; }
+        .plan-btn { background: #f7c843; color: #000; border: none; border-radius: 8px; padding: 10px 16px; font-weight: 800; cursor: pointer; }
+        .plan-btn:hover { opacity: 0.95; }
+
+        .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-mask.show { display: flex; }
+        .profile-modal { width: 820px; max-width: 100%; background: #171717; border: 1px solid #313131; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 24px; font-weight: 900; color: #ff9f2f; }
+        .close-btn { background: transparent; border: none; color: #aaa; font-size: 28px; cursor: pointer; }
+        .modal-body { padding: 24px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group label { display: block; font-size: 13px; color: #aaa; margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; background: #24272b; border: 1px solid #343434; color: #fff; border-radius: 10px; padding: 12px 14px; outline: none; }
+        .form-group textarea { min-height: 90px; resize: vertical; }
+        .full { grid-column: 1 / -1; }
+        .info-card { background: #202020; border: 1px solid #313131; border-radius: 18px; padding: 18px; }
+        .info-card h4 { margin-bottom: 16px; font-size: 18px; color: #f7c843; }
+        .info-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2d2d2d; font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #9ca3af; }
+        .info-value { color: #fff; font-weight: 700; }
+        .modal-footer { padding: 20px 24px; border-top: 1px solid #2a2a2a; display: flex; justify-content: flex-end; gap: 12px; }
+        .btn-dark { background: #252525; color: #fff; border: 1px solid #353535; border-radius: 10px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
+        .btn-gold { background: #f7c843; color: #000; border: none; border-radius: 10px; padding: 12px 18px; font-weight: 800; cursor: pointer; }
+
+        @media (max-width: 1100px) { .cards { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .modal-body { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .topbar { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .page-title { font-size: 30px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="topbar">
+        <div class="logo"><span>▌▌</span><span>POWER GYM</span></div>
+        <div class="top-right">
+            <a href="{{ url_for('user_main') }}" class="btn-top btn-home">返回首页</a>
+            {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-top btn-back">返回管理后台</a>
+            {% endif %}
+            {% if user %}
+                <button class="profile-icon-btn" onclick="openProfileModal()">👤</button>
+            {% endif %}
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="page-title">业务办理</div>
+
+    <div class="status-box">
+        <h2>会员业务中心</h2>
+        <p>在这里办理高级会员、私教课程和体操课程。私教和体操课程仅限有效高级会员办理。</p>
+        {% if vip_active %}
+            <span class="tag vip">当前为高级会员，到期时间：{{ user.expiry_date.strftime('%Y-%m-%d') }}</span>
+        {% else %}
+            <span class="tag normal">当前为普通会员</span>
+        {% endif %}
+    </div>
+
+    <div class="cards">
+        <div class="service-card">
+            <img src="{{ url_for('static', filename='images/vip.jpg') }}" alt="vip">
+            <div class="service-body">
+                <div class="service-title">高级会员</div>
+                <div class="service-desc">开通后可使用签到、签出及私教和体操业务办理，适合长期健身训练用户。</div>
+
+                {% for plan, cfg in business_pricing["高级会员"].items() %}
+                <div class="plan-row">
+                    <div class="plan-left">{{ plan }} <span class="price">¥{{ cfg.price }}</span></div>
+                    <form method="post" action="{{ url_for('user_business_submit') }}">
+                        <input type="hidden" name="biz_type" value="高级会员">
+                        <input type="hidden" name="plan" value="{{ plan }}">
+                        <button class="plan-btn" type="submit">办理</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="service-card">
+            <img src="{{ url_for('static', filename='images/coach.jpg') }}" alt="coach">
+            <div class="service-body">
+                <div class="service-title">私教课程</div>
+                <div class="service-desc">一对一训练指导、动作优化和专项增肌减脂计划。仅限高级会员办理。</div>
+
+                {% for plan, cfg in business_pricing["私教课程"].items() %}
+                <div class="plan-row">
+                    <div class="plan-left">{{ plan }} <span class="price">¥{{ cfg.price }}</span></div>
+                    {% if vip_active %}
+                        <form method="post" action="{{ url_for('user_business_submit') }}">
+                            <input type="hidden" name="biz_type" value="私教课程">
+                            <input type="hidden" name="plan" value="{{ plan }}">
+                            <button class="plan-btn" type="submit">办理</button>
+                        </form>
+                    {% else %}
+                        <button class="plan-btn" type="button" onclick="alert('私教课程仅限高级会员办理，请先开通高级会员！')">不可办理</button>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="service-card">
+            <img src="{{ url_for('static', filename='images/gymnastics.jpg') }}" alt="gymnastics">
+            <div class="service-body">
+                <div class="service-title">体操课程</div>
+                <div class="service-desc">提升柔韧性、核心力量与身体协调能力，仅限高级会员办理。</div>
+
+                {% for plan, cfg in business_pricing["体操课"].items() %}
+                <div class="plan-row">
+                    <div class="plan-left">{{ plan }} <span class="price">¥{{ cfg.price }}</span></div>
+                    {% if vip_active %}
+                        <form method="post" action="{{ url_for('user_business_submit') }}">
+                            <input type="hidden" name="biz_type" value="体操课">
+                            <input type="hidden" name="plan" value="{{ plan }}">
+                            <button class="plan-btn" type="submit">办理</button>
+                        </form>
+                    {% else %}
+                        <button class="plan-btn" type="button" onclick="alert('体操课程仅限高级会员办理，请先开通高级会员！')">不可办理</button>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% include 'partials/profile_modal.html' %}
+</div>
+
+<script>
+function openProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) modal.classList.add('show');
+}
+function closeProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) modal.classList.remove('show');
+}
+window.addEventListener('click', function(e) {
+    const modal = document.getElementById('profileModal');
+    if (modal && e.target === modal) closeProfileModal();
+});
+</script>
+</body>
+</html>
