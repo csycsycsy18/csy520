@@ -9,6 +9,12 @@ app.secret_key = 'gym_mega_final_2026'
 
 # --- 数据库配置 ---
 basedir = os.path.abspath(os.path.dirname(__file__))
+# 关键修改：优先读取环境变量中的 DATABASE_URL
+# 如果读取不到（比如在本地开发），则使用原来的 SQLite
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith("postgres://"):
+    # 为了兼容 SQLAlchemy 2.0，需要将 postgres:// 替换为 postgresql://
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'gym_pro.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
